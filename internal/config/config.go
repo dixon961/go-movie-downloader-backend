@@ -3,7 +3,9 @@ package config
 import "os"
 
 type Config struct {
-	Port string
+	Port           string
+	JackettBaseURL string
+	JackettAPIKey  string
 }
 
 func Load() *Config {
@@ -13,6 +15,8 @@ func Load() *Config {
 	}
 
 	return &Config{
-		Port: port,
+		Port:           port,
+		JackettBaseURL: os.Getenv("JACKETT_BASE_URL"),
+		JackettAPIKey:  os.Getenv("JACKETT_API_KEY"),
 	}
 }
