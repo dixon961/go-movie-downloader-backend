@@ -1,0 +1,73 @@
+version: "3.8"
+
+services:
+  # proxy:
+  #   image: dixon961/easy-proxy:latest
+  #   container_name: vless-proxy
+  #   environment:
+  #     X_UI_LINK: ""
+  #   ports:
+  #     - "1080:1080"
+  #     - "3128:3128"
+  #   networks:
+  #     - proxy-net
+
+  # jackett:
+  #   image: linuxserver/jackett:latest
+  #   container_name: jackett
+  #   environment:
+  #     - PUID=1000
+  #     - PGID=1000
+  #     - TZ=Europe/Amsterdam
+  #   volumes:
+  #     - ./config/jackett:/config
+  #   ports:
+  #     - "9117:9117"
+  #   networks:
+  #     - proxy-net
+
+  # qbittorrent:
+  #   image: linuxserver/qbittorrent:latest
+  #   container_name: qbittorrent
+  #   environment:
+  #     - PUID=1000
+  #     - PGID=1000
+  #     - TZ=Europe/Amsterdam
+  #     - WEBUI_PORT=8080
+  #   volumes:
+  #     - ./config/qbittorrent:/config
+  #     - ./media:/downloads
+  #   ports:
+  #     - "8080:8080"
+  #     - "6881:6881"
+  #     - "6881:6881/udp"
+  #   networks:
+  #     - proxy-net
+
+  movie-downloader-go:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: movie-downloader-go
+    restart: unless-stopped
+    environment:
+      - APP_PORT=8080
+      - JACKETT_BASE_URL=http://jackett:9117/api/v2.0/indexers
+      - JACKETT_API_KEY=${JACKETT_API_KEY}
+      # - QB_URL=http://qbittorrent:8080
+      # - QB_USER=${QB_USER}
+      # - QB_PASS=${QB_PASS}
+      # - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      # - ALLOWED_USERS=${ALLOWED_USERS}
+      - TZ=Europe/Amsterdam
+    ports:
+      - "19000:8080"
+    networks:
+      - proxy-net
+    # depends_on:
+    #   - jackett
+    #   - qbittorrent
+
+networks:
+  proxy-net:
+    external: true
